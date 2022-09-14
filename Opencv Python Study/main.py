@@ -741,16 +741,175 @@ import numpy as np
 # cv.waitKey(0)
 # cv.destroyAllWindows()
 
-import cv2 as cv
-import numpy as np
+# import cv2 as cv
+# import numpy as np
+#
+# img1 = cv.imread('test.jpg', 0)
+# img2 = cv.imread('test1.jpg', 0)
+# ret1, thresh1 = cv.threshold(img1, 127, 255, 0)
+# ret2, thresh2 = cv.threshold(img2, 127, 255, 0)
+# contours1, hierarchy1 = cv.findContours(thresh1, 2, 1)
+# cnt1 = contours1[0]
+# # contours2, hierarchy2 = cv.findContours(thresh2, cv.RETR_LIST, 1)
+# # contours2, hierarchy2 = cv.findContours(thresh2, cv.RETR_EXTERNAL, 1)
+# # contours2, hierarchy2 = cv.findContours(thresh2, cv.RETR_CCOMP, 1)
+# contours2, hierarchy2 = cv.findContours(thresh2, cv.RETR_TREE, 1)
+# cnt2 = contours2[0]
+# ret = cv.matchShapes(cnt1, cnt2, 1, 0.0)
+# print(ret)  # 结果越低，匹配越好
+# print(hierarchy2)
 
-img1 = cv.imread('test.jpg', 0)
-img2 = cv.imread('test1.jpg', 0)
-ret1, thresh1 = cv.threshold(img1, 127, 255, 0)
-ret2, thresh2 = cv.threshold(img2, 127, 255, 0)
-contours, hierarchy = cv.findContours(thresh1, 2, 1)
-cnt1 = contours[0]
-contours, hierarchy = cv.findContours(thresh2, 2, 1)
-cnt2 = contours[0]
-ret = cv.matchShapes(cnt1, cnt2, 1, 0.0)
-print(ret) # 结果越低，匹配越好
+# import cv2 as cv
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# # img = cv.imread('test.jpg', 0)
+# # hist = cv.calcHist([img], [0], None, [256], [0, 256])
+# # hist, bins = np.histogram(img.ravel(), 256, [0, 256])
+# # hist = np.bincount(img.ravel(), minlength=256)
+#
+# # img.ravel()–把多维数组转化成一维数组，指向原数组的地址
+# # img。flatten()-和ravel的作用几乎相同，但是是指向原数组拷贝的地址
+# # plt.hist(img.ravel(),256,[0,256]); plt.show()
+#
+# # img = cv.imread('test.jpg')
+# # color = ('b', 'g', 'r')
+# # for i, col in enumerate(color):
+# #     histr = cv.calcHist([img], [i], None, [256], [0, 256])
+# #     plt.plot(histr,color = col)
+# #     plt.xlim([0,256])
+# # plt.show()
+#
+# img = cv.imread('test.jpg', 0)
+# mask = np.zeros(img.shape[:2], np.uint8)
+# # print(img.shape)
+# mask[100:300, 100:400] = 255
+# masked_img = cv.bitwise_and(img, img, mask=mask)
+# hist_full = cv.calcHist([img], [0], None, [256], [0, 256])
+# hist_mask = cv.calcHist([img], [0], mask, [256], [0, 256])
+# plt.subplot(221), plt.imshow(img, 'gray')
+# plt.subplot(222), plt.imshow(mask, 'gray')
+# plt.subplot(223), plt.imshow(masked_img, 'gray')
+# plt.subplot(224), plt.plot(hist_full), plt.plot(hist_mask)
+# plt.xlim([0, 256])
+# plt.show()
+
+# # 一幅好的图像会有来自图像所有区域的像素。因此，您需要将这个直方图拉伸到两端
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg')
+# hist, bins = np.histogram(img.flatten(), 256, [0, 256])
+# # CDF 累积分布函数(cumulative distribution function)
+# cdf = hist.cumsum()
+# cdf_normalized = cdf * float(hist.max()) / cdf.max()
+#
+# cdf1_m = np.ma.masked_equal(cdf, 0)
+# cdf1_m = (cdf1_m - cdf1_m.min()) * 255 / (cdf1_m.max() - cdf1_m.min())
+# cdf1 = np.ma.filled(cdf1_m, 0).astype('uint8')
+# img2 = cdf1[img]
+# hist1, bins1 = np.histogram(img2.flatten(), 256, [0, 256])
+# cdf2 = hist1.cumsum()
+# cdf2_normalized = cdf2 * float(hist1.max()) / cdf2.max()
+#
+# plt.subplot(211)
+# plt.plot(cdf_normalized, color='b')
+# plt.hist(img.flatten(), 256, [0, 256], color='r')
+# plt.xlim([0, 256])
+# plt.legend(('cdf', 'histogram'), loc='upper left')
+#
+# plt.subplot(212)
+# plt.plot(cdf1, color='b')
+# plt.hist(img2.flatten(), 256, [0, 256], color='r')
+# plt.xlim([0, 256])
+# plt.legend(('cdf', 'histogram'), loc='upper left')
+# plt.show()
+
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg', 0)
+# equ = cv.equalizeHist(img)
+# res = np.hstack((img, equ))
+# cv.imshow('img', res)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# # 为了解决上述2个问题, 就有2方面的解决方法: 一是解决全局性问题, 二是解决背景噪声增强问题.
+# #
+# # 针对全局性问题: 有人提出了对图像分块的方法, 每块区域单独进行直方图均衡, 这样就可以利用局部信息来增强图像, 这样就可以解决全局性问题;
+# # 针对背景噪声增强问题: 主要背景增强太过了, 因而有人提出了对对比度进行限制的方法, 这样就可以解决背景噪声增强问题;
+# # 将上述二者相结合就是 CLAHE 方法, 其全称为: Contrast Limited Adaptive Histogram Equalization.
+# import numpy as np
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg', 0)
+# clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+# cll = clahe.apply(img)
+# cv.imshow('img', img)
+# cv.imshow('cll', cll)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg')
+# hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+# hist = cv.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
+# # hist, xbins, ybins = np.histogram2d(h.ravel(), s.ravel(), [180, 256], [[0, 180], [0, 256]]
+# plt.imshow(hist, interpolation='nearest')
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# roi = cv.imread('test.jpg')
+# hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
+#
+# target = cv.imread('test1.jpg')
+# hsvt = cv.cvtColor(target, cv.COLOR_BGR2HSV)
+#
+# M = cv.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
+# I = cv.calcHist([hsvt], [0, 1], None, [180, 256], [0, 180, 0, 256])
+#
+# R = M / I
+# h, s, v = cv.split(hsvt)
+# B = R[h.ravel(), s.ravel()]
+# B = np.minimum(B, 1)
+# B = B.reshape(hsvt.shape[:2])
+#
+# disc = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
+# cv.filter2D(B, -1, disc, B)
+# B = np.uint8(B)
+# cv.normalize(B, B, 0, 255, cv.NORM_MINMAX)
+#
+# ret,thresh = cv.threshold(B,50,255,0)
+
+import numpy as np
+import cv2 as cv
+
+roi = cv.imread('test.jpg')
+roi = cv.pyrDown(roi)
+hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
+target = cv.imread('test1.jpg')
+target = cv.pyrDown(target)
+hsvt = cv.cvtColor(target, cv.COLOR_BGR2HSV)
+
+roihist = cv.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
+
+cv.normalize(roihist, roihist, 0, 255, cv.NORM_MINMAX)
+dst = cv.calcBackProject([hsvt], [0, 1], roihist, [0, 180, 0, 256], 1)
+
+disc = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
+cv.filter2D(dst, -1, disc, dst)
+
+ret, thresh = cv.threshold(dst, 50, 255, 0)
+thresh = cv.merge((thresh, thresh, thresh))
+res = cv.bitwise_and(target, thresh)
+res = np.vstack((target, thresh, res))
+cv.imshow('res', res)
+cv.waitKey(0)
+cv.destroyAllWindows()
