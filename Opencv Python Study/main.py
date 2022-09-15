@@ -888,28 +888,234 @@ import numpy as np
 #
 # ret,thresh = cv.threshold(B,50,255,0)
 
-import numpy as np
+# import numpy as np
+# import cv2 as cv
+#
+# roi = cv.imread('test.jpg')
+# roi = cv.pyrDown(roi)
+# hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
+# target = cv.imread('test1.jpg')
+# target = cv.pyrDown(target)
+# hsvt = cv.cvtColor(target, cv.COLOR_BGR2HSV)
+#
+# roihist = cv.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
+#
+# cv.normalize(roihist, roihist, 0, 255, cv.NORM_MINMAX)
+# dst = cv.calcBackProject([hsvt], [0, 1], roihist, [0, 180, 0, 256], 1)
+#
+# disc = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
+# cv.filter2D(dst, -1, disc, dst)
+#
+# ret, thresh = cv.threshold(dst, 50, 255, 0)
+# thresh = cv.merge((thresh, thresh, thresh))
+# res = cv.bitwise_and(target, thresh)
+# res = np.vstack((target, thresh, res))
+# cv.imshow('res', res)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# import cv2 as cv
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg', 0)
+# f = np.fft.fft2(img)
+# fshift = np.fft.fftshift(f)
+# magnitude_spectrum = 20 * np.log(np.abs(fshift))
+#
+# rows, cols = img.shape
+# crow, ccol = rows // 2, cols // 2
+# fshift[crow - 30:crow + 31, ccol - 30:ccol + 31] = 0
+# f_ishift = np.fft.ifftshift(fshift)
+# img_back = np.fft.ifft2(f_ishift)
+# img_back = np.real(img_back)
+#
+# # plt.subplot(121), plt.imshow(img, cmap='gray')
+# # plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+# # plt.subplot(122), plt.imshow(magnitude_spectrum, cmap='gray')
+# # plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+# # plt.show()
+#
+# plt.subplot(131), plt.imshow(img, cmap='gray')
+# plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+# plt.subplot(132), plt.imshow(img_back, cmap='gray')
+# plt.title('Image after HPF'), plt.xticks([]), plt.yticks([])
+# plt.subplot(133), plt.imshow(img_back)
+# plt.title('Result in JET'), plt.xticks([]), plt.yticks([])
+# plt.show()
+
+
+# import cv2 as cv
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg', 0)
+# dft = cv.dft(np.float32(img), flags=cv.DFT_COMPLEX_OUTPUT)
+# dft_shift = np.fft.fftshift(dft)
+# magnitude_spectum = 20 * np.log(cv.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
+#
+# # plt.subplot(121), plt.imshow(img, cmap='gray')
+# # plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+# # plt.subplot(122), plt.imshow(magnitude_spectum, cmap='gray')
+# # plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+# # plt.show()
+#
+# rows, cols = img.shape
+# # / 在python3中是浮点数除法，// 是向下取整
+# crow, ccol = rows // 2, cols // 2
+#
+# mask = np.zeros((rows, cols, 2), np.uint8)
+# mask[crow - 30:crow + 30, ccol - 30:ccol + 30] = 1
+#
+# fshift = dft_shift * mask
+# f_ishift = np.fft.ifftshift(fshift)
+# img_back = cv.idft(f_ishift)
+# img_back = cv.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+# plt.subplot(121), plt.imshow(img, cmap='gray')
+# plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+# plt.subplot(122), plt.imshow(img_back, cmap='gray')
+# plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+# plt.show()
+#
+# print("{} {}".format(rows, cols))
+#
+# nrows = cv.getOptimalDFTSize(rows)
+# ncols = cv.getOptimalDFTSize(cols)
+# print("{} {}".format(nrows, ncols))
+#
+# nimg = np.zeros((nrows, ncols))
+# nimg[:rows, :cols] = img
+
+# import cv2 as cv
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# mean_filter = np.ones((3, 3))
+#
+# x = cv.getGaussianKernel(5, 10)
+# gaussian = x * x.T
+#
+# scharr = np.array([[-3, 0, 3],
+#                    [-10, 0, 10],
+#                    [-3, 0, 3]])
+#
+# sobel_x = np.array([[-1, 0, 1],
+#                     [-2, 0, 2],
+#                     [-1, 0, 1]])
+#
+# sobel_y = np.array([[-1, -2, -1],
+#                     [0, 0, 0],
+#                     [1, 2, 1]])
+#
+# laplacian = np.array([[0, 1, 0],
+#                       [1, -4, 1],
+#                       [0, 1, 0]])
+#
+# filters = [mean_filter, gaussian, laplacian, sobel_x, sobel_y, scharr]
+# filter_name = ['mean_filter', 'gaussian', 'laplacian', 'sobel_x', 'sobel_y', 'scharr_x']
+# fft_filters = [np.fft.fft2(x) for x in filters]
+# fft_shift = [np.fft.fftshift(y) for y in fft_filters]
+# mag_spectrum = [np.log(np.abs(z) + 1) for z in fft_shift]
+# for i in range(6):
+#     plt.subplot(2, 3, i + 1), plt.imshow(mag_spectrum[i], cmap='gray')
+#     plt.title(filter_name[i]), plt.xticks([]), plt.yticks([])
+# plt.show()
+
+
+# # 方差匹配方法：匹配度越高，值越接近于0。
+# #
+# #                归一化方差匹配方法：完全匹配结果为0。
+# #
+# #                相关性匹配方法：完全匹配会得到很大值，不匹配会得到一个很小值或0。
+# #
+# #                归一化的互相关匹配方法：完全匹配会得到1， 完全不匹配会得到0。
+# #
+# #                相关系数匹配方法：完全匹配会得到一个很大值，完全不匹配会得到0，完全负相关会得到很大的负数。
+# #
+# #       （此处与书籍以及大部分分享的资料所认为不同，研究公式发现，只有归一化的相关系数才会有[-1,1]的值域）
+# #
+# #                归一化的相关系数匹配方法：完全匹配会得到1，完全负相关匹配会得到-1，完全不匹配会得到0。
+# import cv2 as cv
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg', 0)
+# img2 = img.copy()
+# template = cv.imread('test1.jpg', 0)
+# w, h = template.shape[::-1]
+#
+# methods = ['cv.TM_CCOEFF', 'cv.TM_CCOEFF_NORMED', 'cv.TM_CCORR', 'cv.TM_CCORR_NORMED', 'cv.TM_SQDIFF',
+#            'cv.TM_SQDIFF_NORMED']
+#
+# for meth in methods:
+#     img = img2.copy()
+#     method = eval(meth) # 执行字符串表达的内容
+#
+#     res = cv.matchTemplate(img, template, method)
+#     min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+#
+#     if method in [cv.TM_SQDIFF, cv.TM_SQDIFF_NORMED]:
+#         top_left = min_loc
+#     else:
+#         top_left = max_loc
+#     bottom_right = (top_left[0] + w, top_left[1] + h)
+#     cv.rectangle(img, top_left, bottom_right, 255, 2)
+#     plt.subplot(121), plt.imshow(res, cmap='gray')
+#     plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
+#     plt.subplot(122), plt.imshow(img, cmap='gray')
+#     plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
+#     plt.suptitle(meth)
+#     plt.show()
+
+# import cv2 as cv
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# img_rgb = cv.imread('test.jpg')
+# img_gray = cv.cvtColor(img_rgb, cv.COLOR_BGR2GRAY)
+# template = cv.imread('test1.jpg', 0)
+# w, h = template.shape[::-1]
+# res = cv.matchTemplate(img_gray, template, cv.TM_CCOEFF_NORMED)
+# threshold = 0.8
+# loc = np.where(res >= threshold)
+# for pt in zip(*loc[::-1]): # 加星号把列表里的元素取出来，这样就不会是把整个列表看成一个元素了
+#     cv.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+# cv.imshow('res', res)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
 import cv2 as cv
-
-roi = cv.imread('test.jpg')
-roi = cv.pyrDown(roi)
-hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
-target = cv.imread('test1.jpg')
-target = cv.pyrDown(target)
-hsvt = cv.cvtColor(target, cv.COLOR_BGR2HSV)
-
-roihist = cv.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
-
-cv.normalize(roihist, roihist, 0, 255, cv.NORM_MINMAX)
-dst = cv.calcBackProject([hsvt], [0, 1], roihist, [0, 180, 0, 256], 1)
-
-disc = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
-cv.filter2D(dst, -1, disc, dst)
-
-ret, thresh = cv.threshold(dst, 50, 255, 0)
-thresh = cv.merge((thresh, thresh, thresh))
-res = cv.bitwise_and(target, thresh)
-res = np.vstack((target, thresh, res))
-cv.imshow('res', res)
-cv.waitKey(0)
-cv.destroyAllWindows()
+# import numpy as np
+#
+# img = cv.imread(cv.samples.findFile('test.png'))
+# gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# edges = cv.Canny(gray, 50, 150, apertureSize=3)
+# lines = cv.HoughLines(edges, 1, np.pi / 180, 200)
+# print(lines)
+# for line in lines:
+#     rho, theta = line[0]
+#     a = np.cos(theta)
+#     b = np.sin(theta)
+#     x0 = a*rho
+#     y0 = b*rho
+#     x1 = int(x0 + 1000 * (-b))
+#     y1 = int(y0 + 1000 * (a))
+#     x2 = int(x0 - 1000 * (-b))
+#     y2 = int(y0 - 1000 * (a))
+#     cv.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+# cv.imshow('houghlines all', img)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+#
+# import cv2 as cv
+# import numpy as np
+# img = cv.imread(cv.samples.findFile('sudoku.png'))
+# gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+# edges = cv.Canny(gray,50,150,apertureSize = 3)
+# lines = cv.HoughLinesP(edges,1,np.pi/180,100,minLineLength=100,maxLineGap=10)
+# for line in lines:
+#  x1,y1,x2,y2 = line[0]
+#  cv.line(img,(x1,y1),(x2,y2),(0,255,0),2)
+# cv.imwrite('houghlines probability',img)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
