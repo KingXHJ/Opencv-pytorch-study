@@ -1119,3 +1119,84 @@ import cv2 as cv
 # cv.imwrite('houghlines probability',img)
 # cv.waitKey(0)
 # cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg', 0)
+# img = cv.medianBlur(img, 5)
+# cimg = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+# circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 1, 20, param1=70, param2=50, minRadius=50, maxRadius=200)
+# circles = np.uint16(np.around(circles))
+# for i in circles[0, :]:
+#     cv.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
+#     cv.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
+# cv.imshow('img', cimg)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg')
+# gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+#
+# cv.imshow('gray', gray)
+#
+# ret, thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)  # ret/retval return value
+#
+# cv.imshow('thresh', thresh)
+#
+# kernel = np.ones((3, 3), np.uint8)
+# opening = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel, iterations=2)
+#
+# cv.imshow('opening', opening)
+#
+# sure_bg = cv.dilate(opening, kernel, iterations=3)
+#
+# cv.imshow('sure_bg', sure_bg)
+#
+# dist_transform = cv.distanceTransform(opening, cv.DIST_L2, 5)
+#
+# cv.imshow('dist_transform', dist_transform)
+#
+# ret, sure_fg = cv.threshold(dist_transform, 0.7 * dist_transform.max(), 255, 0)
+#
+# cv.imshow('sure_fg', sure_fg)
+#
+# sure_fg = np.uint8(sure_fg)
+# unknown = cv.subtract(sure_bg, sure_fg)
+#
+# cv.imshow('unkown', unknown)
+#
+# ret, markers = cv.connectedComponents(sure_fg)
+#
+# markers = markers + 1
+#
+# markers[unknown == 255] = 0 # 通过marker = 0的操作，主要是标记处边界可能存在的位置，需要分水岭去解决
+#
+# markers = cv.watershed(img, markers)
+# img[markers == -1] = [255, 0, 0]
+#
+# cv.imshow('img', img)
+#
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg')
+# mask = np.zeros(img.shape[:2], np.uint8)
+# bgdModel = np.zeros((1, 65), np.float64)
+# fgdModel = np.zeros((1, 65), np.float64)
+# rect = (50, 50, 450, 290)
+# cv.grabCut(img, mask, rect, bgdModel, fgdModel, 5, cv.GC_INIT_WITH_RECT)
+# mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+# img = img * mask2[:, :, np.newaxis]
+# plt.imshow(img)
+# plt.colorbar()
+# plt.show()
