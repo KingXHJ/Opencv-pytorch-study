@@ -314,9 +314,10 @@
 #     if k == 27:
 #         break
 # cv.destroyAllWindows()
-import cv2
-import matplotlib.pyplot as plt
-import numpy as np
+
+# import cv2
+# import matplotlib.pyplot as plt
+# import numpy as np
 # import cv2 as cv
 #
 # img = cv.imread('test.jpg')
@@ -1467,34 +1468,54 @@ import numpy as np
 # plt.imshow(img3, 'gray')
 # plt.show()
 
-from __future__ import print_function
+# from __future__ import print_function
+# import cv2 as cv
+# import argparse
+#
+# parser = argparse.ArgumentParser(
+#     description='This program shows how to use background subtraction methods provided by OpenCV. You can process both videos and images.')
+# parser.add_argument('--input', type=str, help='Path to a video or a sequence of image.', default='vtest.avi')
+# parser.add_argument('--algo', type=str, help='Background subtraction method (KNN, MOG2).', default='MOG2')
+# args = parser.parse_args()
+#
+# if args.algo == 'MOG2':
+#     backSub = cv.createBackgroundSubtractorMOG2()
+# else:
+#     backSub = cv.createBackgroundSubtractorKNN()
+# capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
+# if not capture.isOpened:
+#     print('Unable to open: ' + args.input)
+#     exit(0)
+# while True:
+#     ret, frame = capture.read()
+#     if frame is None:
+#         break
+#
+#     fgMask = backSub.apply(frame)
+#
+#     cv.rectangle(frame, (10, 2), (100, 20), (255, 255, 255), -1)
+#
+#     cv.putText(frame, str(capture.get(cv.CAP_PROP_POS_FRAMES)), (15, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+#
+#     cv.imshow('Frame', frame)
+#     cv.imshow('FG Maks',fgMask)
+#
+#     keyboard = cv.waitKey(30)
+#     if keyboard == 'q' or keyboard == 27:
+#         break
+#
+
+import numpy as np
 import cv2 as cv
 import argparse
 
 parser = argparse.ArgumentParser(
-    description='This program shows how to use background subtraction methods provided by OpenCV. You can process both videos and images.')
-parser.add_argument('--input', type=str, help='Path to a video or a sequence of image.', default='vtest.avi')
-parser.add_argument('--algo', type=str, help='Background subtraction method (KNN, MOG2).', default='MOG2')
+    description='This sample demonstrates the meanshift algorithm. The example file can be downloaded from: https://www.bogotobogo.com/python/OpenCV_Python/images/mean_shift_tracking/slow_traffic_small.mp4')
+parser.add_argument('image', type=str, help='path to image file')
 args = parser.parse_args()
-
-if args.algo == 'MOG2':
-    backSub = cv.createBackgroundSubtractorMOG2()
-else:
-    backSub = cv.createBackgroundSubtractorKNN()
-capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
-if not capture.isOpened:
-    print('Unable to open: ' + args.input)
-    exit(0)
-while True:
-    ret, frame = capture.read()
-    if frame is None:
-        break
-
-    fgMask = backSub.apply(frame)
-
-    cv.rectangle(frame, (10, 2), (100, 20), (255, 255, 255), -1)
-
-    cv.putText(frame, str(capture.get(cv.CAP_PROP_POS_FRAMES)), (15, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
-
-    cv.imshow('Frame',frame)
-
+cap = cv.VideoCapture(args.image)
+# 视频的第一帧
+ret, frame = cap.read()
+# 设置窗口的初始位置
+x, y, w, h = 300, 200, 100, 50
+track_window = (x, y, w, h)
