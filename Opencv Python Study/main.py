@@ -1315,7 +1315,186 @@ import cv2 as cv
 # cv.waitKey(0)
 # cv.destroyAllWindows()
 
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg', 0)
+#
+# star = cv.xfeatures2d.StarDetector_create()
+#
+# brief = cv.xfeatures2d.BriefDescriptorExtractor_create()
+#
+# kp = star.detect(img, None)
+# kp, des = brief.compute(img, kp)
+# print(brief.descriptorSize())
+# print(des.shape)
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg', 0)
+#
+# orb = cv.ORB_create()
+#
+# kp = orb.detect(img, None)
+#
+# kp, des = orb.compute(img, kp)
+#
+# img2 = cv.drawKeypoints(img, kp, None, color=(0, 255, 0), flags=0)
+# plt.imshow(img2)
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# import matplotlib.pyplot as plt
+#
+# img1 = cv.imread('test.jpg', 0)
+# img2 = cv.imread('test2.jpg', 0)
+#
+# orb = cv.ORB_create()
+#
+# kp1, des1 = orb.detectAndCompute(img1, None)
+# kp2, des2 = orb.detectAndCompute(img2, None)
+#
+# bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
+# matches = bf.match(des1, des2)
+# matches = sorted(matches, key=lambda x: x.distance)
+# img3 = cv.drawMatches(img1, kp1, img2, kp2, matches[:10], None, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+# plt.imshow(img3)
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# import matplotlib.pyplot as plt
+#
+# img1 = cv.imread('test.jpg', cv.IMREAD_GRAYSCALE)
+# img2 = cv.imread('test1.jpg', cv.IMREAD_GRAYSCALE)
+#
+# sift = cv.xfeatures2d.SIFT_create()
+#
+# kp1, des1 = sift.detectAndCompute(img1, None)
+# kp2, des2 = sift.detectAndCompute(img2, None)
+#
+# bf = cv.BFMatcher()
+# matches = bf.knnMatch(des1, des2, k=2)
+#
+# good = []
+# for m, n in matches:
+#     if m.distance < 0.75 * n.distance:
+#         good.append([m])
+#
+# img3 = cv.drawMatchesKnn(img1, kp1, img2, kp2, good, None, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+# plt.imshow(img3)
+# plt.show()
+
 import numpy as np
+# import cv2 as cv
+# import matplotlib.pyplot as plt
+#
+# img1 = cv.imread('test.jpg', 0)
+# img2 = cv.imread('test1.jpg', 0)
+# sift = cv.xfeatures2d.SIFT_create()
+# kp1, des1 = sift.detectAndCompute(img1, None)
+# kp2, des2 = sift.detectAndCompute(img2, None)
+#
+# FLANN_INDEX_KDTREE = 1
+# index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+# search_params = dict(checks=50)
+# flann = cv.FlannBasedMatcher(index_params, search_params)
+# matches = flann.knnMatch(des1, des2, k=2)
+#
+# matchesMask = [[0, 0] for i in range(len(matches))]
+# for i, (m, n) in enumerate(matches):
+#     if m.distance < 0.7 * n.distance:
+#         matchesMask[i] = [1, 0]
+# draw_params = dict(matchColor=(0, 255, 0), singlePointColor=(255, 0, 0), matchesMask=matchesMask,
+#                    flags=cv.DrawMatchesFlags_DEFAULT)
+#
+# img3 = cv.drawMatchesKnn(img1, kp1, img2, kp2, matches, None, **draw_params)
+# plt.imshow(img3)
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# MIN_MATCH_COUNT = 10
+#
+# img1 = cv.imread('test.jpg', 0)
+# img2 = cv.imread('test1.jpg', 0)
+#
+# sift = cv.xfeatures2d.SIFT_create()
+#
+# kp1, des1 = sift.detectAndCompute(img1, None)
+# kp2, des2 = sift.detectAndCompute(img2, None)
+# FLANN_INDEX_KDTREE = 1
+# index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+# search_params = dict(checks=50)
+# flann = cv.FlannBasedMatcher(index_params, search_params)
+# matches = flann.knnMatch(des1, des2, k=2)
+# good = []
+# for m, n in matches:
+#     if m.distance < 0.7 * n.distance:
+#         good.append(m)
+#
+# if len(good) > MIN_MATCH_COUNT:
+#     # 之前一直不明白match与knnmatch的返回值到底是什么，查阅了一些资料才理解。
+#     #
+#     # 其实二者都是返回的DMatch类型的数据结构。
+#     # 那么这个这个DMatch数据结构究竟是什么呢？
+#     # 它包含三个非常重要的数据分别是queryIdx，trainIdx，distance
+#     # 先说一下这三个分别是什么在演示其用途：
+#     # queryIdx：测试图像的特征点描述符的下标（第几个特征点描述符），同时也是描述符对应特征点的下标。
+#     # trainIdx：样本图像的特征点描述符下标,同时也是描述符对应特征点的下标。
+#     # distance：代表这怡翠匹配的特征点描述符的欧式距离，数值越小也就说明俩个特征点越相近。
+#     # 每个特征点本身也具有以下属性：.pt:关键点坐标，.angle：表示关键点方向，.response表示响应强度，.size:标书该点的直径大小。
+#     src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
+#     dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
+#     M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 5.0)
+#     matchesMask = mask.ravel().tolist()
+#     h, w= img1.shape
+#     pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0], [w - 1, 0]]).reshape(-1, 1, 2)
+#     dst = cv.perspectiveTransform(pts, M)
+#     img2 = cv.polylines(img2, [np.int32(dst)], True, 255, 3, cv.LINE_AA)
+# else:
+#     print("Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT))
+#     matchesMask = None
+#
+# draw_params = dict(matchColor=(0, 255, 0), singlePointColor=None, matchesMask=matchesMask, flags=2)
+# img3 = cv.drawMatches(img1, kp1, img2, kp2, good, None, **draw_params)
+# plt.imshow(img3, 'gray')
+# plt.show()
+
+from __future__ import print_function
 import cv2 as cv
-from matplotlib import pyplot as plt
-img =
+import argparse
+
+parser = argparse.ArgumentParser(
+    description='This program shows how to use background subtraction methods provided by OpenCV. You can process both videos and images.')
+parser.add_argument('--input', type=str, help='Path to a video or a sequence of image.', default='vtest.avi')
+parser.add_argument('--algo', type=str, help='Background subtraction method (KNN, MOG2).', default='MOG2')
+args = parser.parse_args()
+
+if args.algo == 'MOG2':
+    backSub = cv.createBackgroundSubtractorMOG2()
+else:
+    backSub = cv.createBackgroundSubtractorKNN()
+capture = cv.VideoCapture(cv.samples.findFileOrKeep(args.input))
+if not capture.isOpened:
+    print('Unable to open: ' + args.input)
+    exit(0)
+while True:
+    ret, frame = capture.read()
+    if frame is None:
+        break
+
+    fgMask = backSub.apply(frame)
+
+    cv.rectangle(frame, (10, 2), (100, 20), (255, 255, 255), -1)
+
+    cv.putText(frame, str(capture.get(cv.CAP_PROP_POS_FRAMES)), (15, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+
+    cv.imshow('Frame',frame)
+
