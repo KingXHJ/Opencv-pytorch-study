@@ -315,6 +315,7 @@
 #         break
 # cv.destroyAllWindows()
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 # import cv2 as cv
 #
@@ -1200,3 +1201,121 @@ import cv2 as cv
 # plt.imshow(img)
 # plt.colorbar()
 # plt.show()
+
+# import cv2 as cv
+# import numpy as np
+#
+# filename = 'test.jpg'
+# img = cv.imread(filename)
+# gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# gray = np.float32(gray)
+# dst = cv.cornerHarris(gray, 2, 3, 0.04)
+#
+# dst = cv.dilate(dst, None)
+#
+# img[dst > 0.01 * dst.max()] = [0, 0, 255]
+# cv.imshow('dst', img)
+# if cv.waitKey(0) & 0xff == 27:
+#     cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2 as cv
+#
+# filename = 'test.jpg'
+# img = cv.imread(filename)
+# gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# gray = np.float32(gray)
+# dst = cv.cornerHarris(gray, 2, 3, 0.04)
+# dst = cv.dilate(dst, None)
+# ret, dst = cv.threshold(dst, 0.01 * dst.max(), 255, 0)
+# dst = np.uint8(dst)
+# # 连通域分析
+# ret, labels, stats, centroids = cv.connectedComponentsWithStats(dst)
+# # 设置寻找亚像素角点的参数，采用的停止准则是最大循环次数30和最大误差容限0.001
+# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 100, 0.001)
+# corners = cv.cornerSubPix(gray, np.float32(centroids), (5, 5), (-1, -1), criteria)
+#
+# res = np.hstack((centroids, corners))
+# res = np.int0(res)
+# img[res[:, 1], res[:, 0]] = [0, 0, 255]
+# img[res[:, 3],res[:, 2]] = [0, 255, 0]
+# cv.imshow('img', img)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg')
+# gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# corners = cv.goodFeaturesToTrack(gray, 25, 0.01, 10)
+# corners = np.int0(corners)
+# for i in corners:
+#     print(i)
+#     x, y = i.ravel() # 拉成一维数组
+#     cv.circle(img, (x, y), 3, (255, 0, 0), -1)
+# plt.imshow(img)
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg')
+# gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+# sift = cv.xfeatures2d.SIFT_create()
+# kp = sift.detect(gray, None)
+# # kp, des = sift.detectAndCompute(gray, None)
+# img = cv.drawKeypoints(gray, kp, img)
+# cv.imshow('sift_keypoints', img)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg', 0)
+#
+# surf = cv.xfeatures2d.SURF_create(50)
+# kp, des = surf.detectAndCompute(img, None)
+#
+# img2 = cv.drawKeypoints(img, kp, None, (255, 0, 0), 4)
+# print(surf.getUpright())
+# surf.setUpright(True)
+#
+# kp3 = surf.detect(img, None)
+# img3 = cv.drawKeypoints(img, kp, None, (255, 0, 0), 4)
+# plt.imshow(img2)
+# plt.imshow(img3)
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg')
+# fast = cv.FastFeatureDetector_create()
+#
+# kp = fast.detect(img, None)
+# img2 = cv.drawKeypoints(img, kp, None, color=(255, 0, 0))
+#
+# print("Threshold: {}".format(fast.getThreshold()))
+# print("nonmaxSuppression:{}".format(fast.getNonmaxSuppression()))
+# print("neighborhood: {}".format(fast.getType()))
+# print("Total Keypoints with nonmaxSuppression: {}".format(len(kp)))
+#
+# cv.imshow('img2', img2)
+# fast.setNonmaxSuppression(0)
+# kp = fast.detect(img, None)
+# print("Total Keypoints without nonmaxSuppression: {}".format(len(kp)))
+#
+# img3 = cv.drawKeypoints(img, kp, None, color=(255, 0, 0))
+# cv.imshow('img3', img3)
+#
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+import numpy as np
+import cv2 as cv
+from matplotlib import pyplot as plt
+img =
