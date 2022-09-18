@@ -1086,7 +1086,7 @@
 # cv.waitKey(0)
 # cv.destroyAllWindows()
 
-import cv2 as cv
+# import cv2 as cv
 # import numpy as np
 #
 # img = cv.imread(cv.samples.findFile('test.png'))
@@ -1505,17 +1505,260 @@ import numpy as np
 #         break
 #
 
-import numpy as np
-import cv2 as cv
-import argparse
+# import numpy as np
+# import cv2 as cv
+# import argparse
+#
+# parser = argparse.ArgumentParser(
+#     description='This sample demonstrates the meanshift algorithm. The example file can be downloaded from: https://www.bogotobogo.com/python/OpenCV_Python/images/mean_shift_tracking/slow_traffic_small.mp4')
+# parser.add_argument('image', type=str, help='path to image file')
+# args = parser.parse_args()
+# cap = cv.VideoCapture(args.image)
+# # 视频的第一帧
+# ret, frame = cap.read()
+# # 设置窗口的初始位置
+# x, y, w, h = 300, 200, 100, 50
+# track_window = (x, y, w, h)
+#
+# roi = frame[y:y + h, x:x + w]
+# hsv_roi = cv.cvtColor(roi, cv.COLOR_BGR2GHSV)
+# # OpenCV中的inRange()函数可实现二值化功能（这点类似threshold()函数），更关键的是可以同时针对多通道进行操作，使用起来非常方便！主要是将在两个阈值内的像素值设置为白色（255），而不在阈值区间内的像素值设置为黑色（0），该功能类似于之间所讲的双阈值化操作。
+# mask = cv.inRange(hsv_roi, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+# roi_hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])
+# cv.normalize(roi_hist, roi_hist, 0, 255, cv.NORM_MINMAX)
+# # 设置终止条件，可以是10次迭代，也可以至少移动1 pt
+# term_crit = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1)
+# while (1):
+#     ret, frame = cap.read()
+#     if ret == True:
+#         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+#         dst = cv.calcBackProject([hsv], [0], roi_hist, [0, 180], 1)
+#         # 应用meanshift来获取新位置
+#         ret, track_window = cv.meanShift(dst, track_window, term_crit)
+#         # 在图像上绘制
+#         x, y, w, h = track_window
+#         img2 = cv.rectangle(frame, (x, y), (x + w, y + h), 255, 2)
+#         cv.imshow('img2', img2)
+#         k = cv.waitKey(30) & 0xff
+#         if k == 27:
+#             break
+#     else:
+#         break
 
-parser = argparse.ArgumentParser(
-    description='This sample demonstrates the meanshift algorithm. The example file can be downloaded from: https://www.bogotobogo.com/python/OpenCV_Python/images/mean_shift_tracking/slow_traffic_small.mp4')
-parser.add_argument('image', type=str, help='path to image file')
-args = parser.parse_args()
-cap = cv.VideoCapture(args.image)
-# 视频的第一帧
-ret, frame = cap.read()
-# 设置窗口的初始位置
-x, y, w, h = 300, 200, 100, 50
-track_window = (x, y, w, h)
+# import numpy as np
+# import cv2 as cv
+# import argparse
+#
+# parser = argparse.ArgumentParser(
+#     description='This sample demonstrates the camshift algorithm. The example file can be downloaded from: https://www.bogotobogo.com/python/OpenCV_Python/images/mean_shift_tracking/slow_traffic_small.mp4')
+# parser.add_argument('image', type=str, help='path to image file')
+# args = parser.parse_args()
+# cap = cv.VideoCapture(args.image)
+# # 获取视频第一帧
+# ret, frame = cap.read()
+# # 设置初始窗口
+# x, y, w, h = 300, 200, 100, 50  # simply hardcoded the values
+# track_window = (x, y, w, h)
+# # 设置追踪的ROI窗口
+# roi = frame[y:y + h, x:x + w]
+# hsv_roi = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
+# mask = cv.inRange(hsv_roi, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+# roi_hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])
+# cv.normalize(roi_hist, roi_hist, 0, 255, cv.NORM_MINMAX)
+# # 设置终止条件，可以是10次迭代，有可以至少移动1个像素
+# term_crit = ( cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1 )
+# while(1):
+#      ret, frame = cap.read()
+#      if ret == True:
+#          hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+#          dst = cv.calcBackProject([hsv],[0],roi_hist,[0,180],1)
+#          # 应用camshift 到新位置
+#          ret, track_window = cv.CamShift(dst, track_window, term_crit)
+#          # 在图像上画出来
+#          pts = cv.boxPoints(ret)
+#          pts = np.int0(pts)
+#          img2 = cv.polylines(frame,[pts],True, 255,2)
+#          cv.imshow('img2',img2)
+#          k = cv.waitKey(30) & 0xff
+#          if k == 27:
+#             break
+#      else:
+#         break
+
+# import numpy as np
+# import cv2 as cv
+# import argparse
+#
+# parser = argparse.ArgumentParser(
+#     description='This sample demonstrates LucasKanade Optical Flow calculation. The example file can be downloaded  from: https://www.bogotobogo.com/python/OpenCV_Python/images/mean_shift_tracking/slow_traffic_small.mp4')
+# parser.add_argument('image', type=str, help='path to image file')
+# args = parser.parse_args()
+# cap = cv.VideoCapture(args.image)
+# # 用于ShiTomasi拐点检测的参数
+# feature_params = dict(maxCorners=100, qualityLevel=0.3, minDistance=7, blockSize=7)
+# # lucas kanade光流参数
+# lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
+# # 创建一些随机的颜色
+# color = np.random.randint(0, 255, (100, 3))
+# # 拍摄第一帧并在其中找到拐角
+# ret, old_frame = cap.read()
+# old_gray = cv.cvtColor(old_frame, cv.COLOR_BGR2GRAY)
+# p0 = cv.goodFeaturesToTrack(old_gray, mask=None, **feature_params)
+# # 创建用于作图的掩码图像
+# mask = np.zeros_like(old_frame)
+# while (1):
+#     ret, frame = cap.read()
+#     frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+#     # 计算光流
+#     p1, st, err = cv.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
+#     # 选择良好点
+#     good_new = p1[st == 1]
+#     good_old = p0[st == 1]
+#     for i, (new, old) in enumerate(zip(good_new, good_old)):
+#         a, b = np.int0(new.ravel())
+#         c, d = np.int0(new.ravel())
+#         mask = cv.line(mask, (a, b), (c, d), color[i].tolist(), 2)
+#         frame = cv.circle(frame, (a, b), 5, color[i].tolist(), -1)
+#     img = cv.add(frame, mask)
+#     cv.imshow('frame', img)
+#     k = cv.waitKey(30) & 0xff
+#     if k == 27:
+#         break
+#     old_gray = frame_gray.copy()
+#     p0 = good_new.reshape(-1, 1, 2)
+
+# import numpy as np
+# import cv2 as cv
+#
+# cap = cv.VideoCapture('test.MP4')
+# ret, frame1 = cap.read()
+# prvs = cv.cvtColor(frame1, cv.COLOR_BGR2GRAY)
+# hsv = np.zeros_like(frame1)
+# # 它是省略所有的冒号而用省略号代替。
+# #
+# # a[:, :, None]和a[..., None]的输出是一样的，就是因为...代替了前面两个冒号
+# hsv[..., 1] = 255
+# while (1):
+#     ret, frame2 = cap.read()
+#     next = cv.cvtColor(frame2, cv.COLOR_BGR2GRAY)
+#     flow = cv.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+#     mag, ang = cv.cartToPolar(flow[..., 0], flow[..., 1])
+#     hsv[..., 0] = ang * 180 / np.pi / 2
+#     hsv[..., 2] = cv.normalize(mag, None, 0, 255, cv.NORM_MINMAX)
+#     bgr = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
+#     cv.imshow('frame2', bgr)
+#     k = cv.waitKey(30) & 0xff
+#     if k == 27:
+#         break
+#     elif k == ord('s'):
+#         cv.imshow('frame2', frame2)
+#         cv.imshow('bgr', bgr)
+#     prvs = next
+
+# import numpy as np
+# import cv2 as cv
+# import glob
+#
+# # 终止条件
+# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+# # 准备对象点， 如 (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
+# objp = np.zeros((6 * 7, 3), np.float32)
+# objp[:, :2] = np.mgrid[0:7, 0:6].T.reshape(-1, 2)
+# # 用于存储所有图像的对象点和图像点的数组。
+# objpoints = []  # 真实世界中的3d点
+# imgpoints = []  # 图像中的2d点
+# images = glob.glob('test4.png')
+# for fname in images:
+#     img = cv.imread(fname)
+#     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+#     # cv.imshow('gray', gray)
+#     # cv.waitKey(0)
+#     # 找到棋盘角落
+#     ret, corners = cv.findChessboardCorners(gray, (7, 6), None)
+#     print(ret)
+#     # 如果找到，添加对象点，图像点（细化之后）
+#     if ret == True:
+#         objpoints.append(objp)
+#         corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+#         imgpoints.append(corners)
+#         ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+#         h, w = img.shape[:2]
+#         newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+#         # undistort 使用cv.undistort() 这是最简单的方法。只需调用该函数并使用上面获得的ROI裁剪结果即可。
+#         dst = cv.undistort(img, mtx, dist, None, newcameramtx)
+#         # 剪裁图像
+#         x, y, w, h = roi
+#         dst = dst[y:y + h, x:x + w]
+#         cv.imshow('calibresult', dst)
+#         cv.waitKey(0)
+#         # undistort 使用remapping 该方式有点困难。首先，找到从扭曲图像到未扭曲图像的映射函数。然后使用重映射功能。
+#         mapx, mapy = cv.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (w, h), 5)
+#         dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
+#         # 裁剪图像
+#         x, y, w, h = roi
+#         dst = dst[y:y + h, x:x + w]
+#         cv.imwrite('calibresult2', dst)
+#         cv.waitKey(0)
+#         # 为了找到平均误差，我们计算为所有校准图像计算的误差的算术平均值。
+#         mean_error = 0
+#         for i in range(len(objpoints)):
+#             imgpoints2, _ = cv.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
+#             error = cv.norm(imgpoints[i], imgpoints2, cv.NORM_L2) / len(imgpoints2)
+#             mean_error += error
+#         print("total error: {}".format(mean_error / len(objpoints)))
+#         # 绘制并显示拐角
+#         cv.drawChessboardCorners(img, (7, 6), corners2, ret)
+#         cv.imshow('img', img)
+#         cv.waitKey(0)
+# cv.destroyAllWindows()
+
+
+# import numpy as np
+# import cv2 as cv
+# import glob
+#
+#
+# def draw(img, corners, imgpts):
+#     corner = tuple(corners[0].ravel())
+#     img = cv.line(img, corner, tuple(imgpts[0].ravel()), (255, 0, 0), 5)
+#     img = cv.line(img, corner, tuple(imgpts[1].ravel()), (0, 255, 0), 5)
+#     img = cv.line(img, corner, tuple(imgpts[2].ravel()), (0, 0, 255), 5)
+#     return img
+#
+# # 终止条件
+# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+# # 准备对象点， 如 (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
+# objp = np.zeros((6 * 7, 3), np.float32)
+# objp[:, :2] = np.mgrid[0:7, 0:6].T.reshape(-1, 2)
+# axis = np.float32([[3, 0, 0], [0, 3, 0], [0, 0, -3]]).reshape(-1, 3)
+# # 用于存储所有图像的对象点和图像点的数组。
+# objpoints = []  # 真实世界中的3d点
+# imgpoints = []  # 图像中的2d点
+# images = glob.glob('test4.png')
+# for fname in images:
+#     img = cv.imread(fname)
+#     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+#     # cv.imshow('gray', gray)
+#     # cv.waitKey(0)
+#     # 找到棋盘角落
+#     ret, corners = cv.findChessboardCorners(gray, (7, 6), None)
+#     print(ret)
+#     # 如果找到，添加对象点，图像点（细化之后）
+#     if ret == True:
+#         objpoints.append(objp)
+#         corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+#         imgpoints.append(corners)
+#         ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+#         corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+#         # 找到旋转和平移矢量。
+#         ret, rvecs, tvecs = cv.solvePnP(objp, corners2, mtx, dist)
+#         # 将3D点投影到图像平面
+#         imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, mtx, dist)
+#         img = draw(img, corners2, imgpts)
+#         cv.imshow('img', img)
+#         k = cv.waitKey(0) & 0xff
+#         if k == ord('s'):
+#             cv.imshow(fname[:6] + '.png', img)
+# cv.destroyAllWindows()
+
+
