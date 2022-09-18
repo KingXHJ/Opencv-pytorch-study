@@ -1761,4 +1761,153 @@ import numpy as np
 #             cv.imshow(fname[:6] + '.png', img)
 # cv.destroyAllWindows()
 
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+#
+# def drawlines(img1, img2, lines, pts1, pts2):
+#     ''' img1 - 我们在img2相应位置绘制极点生成的图像
+#      lines - 对应的极点 '''
+#     r, c = img1.shape
+#     img1 = cv.cvtColor(img1, cv.COLOR_GRAY2BGR)
+#     img2 = cv.cvtColor(img2, cv.COLOR_GRAY2BGR)
+#     for r, pt1, pt2 in zip(lines, pts1, pts2):
+#         color = tuple(np.random.randint(0, 255, 3).tolist())
+#         x0, y0 = map(int, [0, -r[2] / r[1]])
+#         x1, y1 = map(int, [c, -(r[2] + r[0] * c) / r[1]])
+#         img1 = cv.line(img1, (x0, y0), (x1, y1), color, 1)
+#         img1 = cv.circle(img1, tuple(pt1), 5, color, -1)
+#         img2 = cv.circle(img2, tuple(pt2), 5, color, -1)
+#     return img1, img2
+#
+#
+# img1 = cv.imread('test.jpg', 0)
+# img2 = cv.imread('test1.jpg', 0)
+# sift = cv.SIFT()
+# # 使用SIFT查找关键点和描述符
+# kp1, des1 = sift.detectAndCompute(img1, None)
+# kp2, des2 = sift.detectAndCompute(img2, None)
+#
+# FLANN_INDEX_KDTREE = 1
+# index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+# search_params = dict(checks=50)
+# flann = cv.FlannBasedMatcher(index_params, search_params)
+# matches = flann.knnMatch(des1, des2, k=2)
+# good = []
+# pts1 = []
+# pts2 = []
+# # 根据Lowe的论文进行比率测试
+# for i, (m, n) in enumerate(matches):
+#     if m.distance < 0.8 * n.distance:
+#         good.append(m)
+#         pts2.append(kp2[m.trainIdx].pt)
+#         pts1.append(kp1[m.queryIdx].pt)
+#
+# pts1 = np.int32(pts1)
+# pts2 = np.int32(pts2)
+# F, mask = cv.findFundamentalMat(pts1, pts2, cv.FM_LMEDS)
+# # 我们只选择内点
+# pts1 = pts1[mask.ravel() == 1]
+# pts2 = pts2[mask.ravel() == 1]
+#
+# # 在右图（第二张图）中找到与点相对应的极点，然后在左图绘制极线
+# lines1 = cv.computeCorrespondEpilines(pts2.reshape(-1, 1, 2), 2, F)
+# lines1 = lines1.reshape(-1, 3)
+# img5, img6 = drawlines(img1, img2, lines1, pts1, pts2)
+# # 在左图（第一张图）中找到与点相对应的Epilines，然后在正确的图像上绘制极线
+# lines2 = cv.computeCorrespondEpilines(pts1.reshape(-1, 1, 2), 1, F)
+# lines2 = lines2.reshape(-1, 3)
+# img3, img4 = drawlines(img2, img1, lines2, pts2, pts1)
+# plt.subplot(121)
+# plt.imshow(img5)
+# plt.subplot(122)
+# plt.imshow(img3)
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# imgL = cv.imread('test.jpg', 0)
+# imgR = cv.imread('test1.jpg', 0)
+# stereo = cv.StereoBM_create(numDisparities=16, blockSize=15)
+# disparity = stereo.compute(imgL, imgR)
+# plt.imshow(disparity, 'gray')
+# plt.show()
+
+# import cv2 as cv
+# import numpy as np
+# import matplotlib.pyplot as plt
+#
+# trainData = np.random.randint(0, 100, (25, 2)).astype(np.float32)
+# responses = np.random.randint(0, 2, (25, 1)).astype(np.float32)
+#
+# red = trainData[responses.ravel() == 0]
+# plt.scatter(red[:, 0], red[:, 1], 80, 'r', '^')
+#
+# blue = trainData[responses.ravel() == 1]
+# plt.scatter(blue[:, 0], blue[:, 1], 80, 'b', 's')
+#
+# newcomer = np.random.randint(0, 100, (10, 2)).astype(np.float32)
+# plt.scatter(newcomer[:, 0], newcomer[:, 1], 80, 'g', 'o')
+# knn = cv.ml.KNearest_create()
+# knn.train(trainData, cv.ml.ROW_SAMPLE, responses)
+# ret, results, neighbours, dist = knn.findNearest(newcomer, 3)
+# print("result: {}\n".format(results))
+# print("neighbours: {}\n".format(neighbours))
+# print("distance: {}\n".format(dist))
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg')
+# gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+#
+# cells = [np.hsplit(row, 100) for row in np.vsplit(gray, 50)]
+#
+# x = np.array(cells)
+#
+# train = x[:, :50].reshape(-1, 400).astype(np.float32)
+# test = x[:, 50:100].reshape(-1, 400).astype(np.float32)
+#
+# k = np.arange(10)
+# train_labels = np.repeat(k, 250)[:, np.newaxis]
+# test_labels = train_labels.copy()
+#
+# knn = cv.ml.KNearest_create()
+# knn.train(train, cv.ml.ROW_SAMPLE, train_labels)
+# ret, result, neighbours, dist = knn.findNearest(test, k=5)
+#
+# matches = result == test_labels
+# correct = np.count_nonzero(matches)
+# accuracy = correct * 100.0 / result.size
+# print(accuracy)
+#
+# np.savez('knn_data.npz', train=train, train_labels=train_labels)
+#
+# with np.load('knn_data.npz') as data:
+#     print(data.files)
+#     train = data['train']
+#     train_labels = data['train_labels']
+
+import cv2 as cv
+# import numpy as np
+#
+# data = np.loadtxt('letter-recognition.data', dtype='float32', delimiter=',',
+#                   converters={0: lambda ch: ord(ch) - ord('A')})
+#
+# train, test = np.vsplit(data, 2)
+#
+# responses, trainData = np.hsplit(train, [1])
+# labels, testData = np.hsplit(test, [1])
+#
+# knn = cv.ml.KNearest_create()
+# knn.train(trainData, cv.ml.ROW_SAMPLE, responses)
+# ret, result, neighbours, dist = knn.findNearest(testData, k=5)
+# correct = np.count_nonzero(result == labels)
+# accuracy = correct * 100.0 / 10000
+# print(accuracy)
+
 
