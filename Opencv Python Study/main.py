@@ -1910,4 +1910,270 @@ import cv2 as cv
 # accuracy = correct * 100.0 / 10000
 # print(accuracy)
 
+# import cv2 as cv
+# import numpy as np
+#
+# SZ = 20
+# bin_n = 16
+# affine_flags = cv.WARP_INVERSE_MAP | cv.INTER_LINEAR
+#
+#
+# def deskew(img):
+# opencv中提供了moments()来计算图像中的中心矩(最高到三阶)，HuMoments()用于由中心矩计算Hu矩.同时配合函数contourArea函数计算轮廓面积和arcLength来计算轮廓或曲线长度
+#     m = cv.moments(img)
+#     if abs(m['mu02']) < 1e-2:
+#         return img.copy()
+#     skew = m['mu11'] / m['mu02']
+#     M = np.float32([[1, skew, -0.5 * SZ * skew], [0, 1, 0]])
+#     img = cv.warpAffine(img, M, (SZ, SZ), flags=affine_flags)
+#     return img
+#
+#
+# def hog(img):
+#     gx = cv.Sobel(img, cv.CV_32F, 1, 0)
+#     gy = cv.Sobel(img, cv.CV_32F, 0, 1)
+#     mag, ang = cv.cartToPolar(gx, gy)
+#     bins = np.int32(bin_n * ang / (2 * np.pi))
+#     bin_cells = bins[:10, :10], bins[10:, :10], bins[:10, 10:], bins[10:, 10:]
+#     mag_cells = mag[:10, :10], mag[10:, :10], mag[:10, 10:], mag[10:, 10:]
+#     hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+#     hist = np.hstack(hists)
+#     return hist
+#
+#
+# img = cv.imread('digits.png', 0)
+# if img is None:
+#     raise Exception("we need the digits.png image from samples/data here !")
+# cells = [np.hsplit(row, 100) for row in np.vsplit(img, 50)]
+#
+# train_cells = [i[:50] for i in cells]
+# test_cells = [i[50:] for i in cells]
+# # map()是 Python 内置的高阶函数，它接收一个函数 f 和一个 list，并通过把函数 f 依次作用在 list 的每个元素上，得到一个新的 list 并返回。
+# deskewed = [list(map(deskew, row)) for row in train_cells]
+# hogdata = [list(map(hog, row)) for row in deskewed]
+# trainData = np.float32(hogdata).reshape(-1, 64)
+# responses = np.repeat(np.arange(10), 250)[:, np.newaxis]
+# svm = cv.ml.SVM_create()
+# svm.setKernel(cv.ml.SVM_LINEAR)
+# svm.setType(cv.ml.SVM_C_SVC)
+# svm.setC(2.67)
+# svm.setGamma(5.383)
+# svm.train(trainData, cv.ml.ROW_SAMPLE, responses)
+# svm.save('svm_data.dat')
+# deskewed = [list(map(deskew, row)) for row in test_cells]
+# hogdata = [list(map(hog, row)) for row in deskewed]
+# testData = np.float32(hogdata).reshape(-1, bin_n * 4)
+# result = svm.predict(testData)[1]
+# mask = result == responses
+# correct = np.count_nonzero(mask)
+# print(correct * 100.0 / result.size)
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# x = np.random.randint(25, 100, 25)
+# y = np.random.randint(175, 255, 25)
+# z = np.hstack((x, y))
+# z = z.reshape((50, 1))
+# z = np.float32(z)
+# plt.hist(z, 256, [0, 256])
+# plt.show()
+#
+# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+#
+# flags = cv.KMEANS_RANDOM_CENTERS
+#
+# compactness, labels, centers = cv.kmeans(z, 2, None, criteria, 10, flags)
+#
+# A = z[labels == 0]
+# B = z[labels == 1]
+#
+# plt.hist(A, 256, [0, 256], color='r')
+# plt.hist(B, 256, [0, 256], color='b')
+# plt.hist(centers, 32, [0, 256], color='y')
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# X = np.random.randint(25, 50, (25, 2))
+# Y = np.random.randint(60, 85, (25, 2))
+# Z = np.vstack((X, Y))
+#
+# Z = np.float32(Z)
+#
+# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+# ret, label, center = cv.kmeans(Z, 2, None, criteria, 10, cv.KMEANS_RANDOM_CENTERS)
+#
+# A = Z[label.ravel() == 0]
+# B = Z[label.ravel() == 1]
+#
+# plt.scatter(A[:, 0], A[:, 1])
+# plt.scatter(B[:, 0], B[:, 1], c='r')
+# plt.scatter(center[:, 0], center[:, 1], s=80, c='y', marker='s')
+# plt.xlabel('Height')
+# plt.ylabel('Weight')
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg')
+# Z = img.reshape((-1, 3))
+#
+# Z = np.float32(Z)
+#
+# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+# K = 8
+# ret, label, center = cv.kmeans(Z, K, None, criteria, 10, cv.KMEANS_RANDOM_CENTERS)
+#
+# center = np.uint8(center)
+# res = center[label.flatten()]
+# res2 = res.reshape((img.shape))
+# cv.imshow('res2', res2)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# img = cv.imread('test.jpg')
+# 图像中的蓝色补丁看起来很相似。绿色补丁看起来很相似。因此，我们获取一个像素，在其周围
+# 获取一个小窗口，在图像中搜索相似的窗口，对所有窗口求平均，然后用得到的结果替换该像
+# 素。此方法是“非本地均值消噪”。与我们之前看到的模糊技术相比，它花费了更多时间，但是效果
+# 非常好。更多信息和在线演示可在其他资源的第一个链接中找到
+# dst = cv.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
+# plt.subplot(121)
+# plt.imshow(img)
+# plt.subplot(122)
+# plt.imshow(dst)
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+# from matplotlib import pyplot as plt
+#
+# cap = cv.VideoCapture('test.jpg')
+#
+# img = [cap.read()[1] for i in range(5)]
+#
+# gray = [cv.cvtColor(i, cv.COLOR_BGR2GRAY) for i in img]
+# gray = [np.float64(i) for i in gray]
+#
+# noise = np.random.randn(*gray[1].shape) * 10
+#
+# noisy = [1 + noise for i in gray]
+#
+# noisy = [np.uint8(np.clip(i, 0, 255)) for i in noisy]
+#
+# dst = cv.fastNlMeansDenoisingColoredMulti(noisy, 2, 5, None, 4, 7, 35)
+# plt.subplot(131),plt.imshow(gray[2],'gray')
+# plt.subplot(132),plt.imshow(noisy[2],'gray')
+# plt.subplot(133),plt.imshow(dst,'gray')
+# plt.show()
+
+# import numpy as np
+# import cv2 as cv
+#
+# img = cv.imread('test.jpg')
+# mask = cv.imread('test1.jpg', 0)
+# # 基本思路很简单：用邻近的像素替换那些坏标记，使其看起来像是邻居
+# dst = cv.inpaint(img, mask, 3, cv.INPAINT_TELEA)
+# cv.imshow('dst', dst)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+
+# import cv2 as cv
+# import numpy as np
+#
+# img_fn = ["1.jpg", "2.jpg", "3.jpg", "4.jpg"]
+# img_list = [cv.imread(fn) for fn in img_fn]
+# exposure_times = np.array([15.0, 2.5, 0.25, 0.0333], dtype=np.float32)
+#
+# merge_debevec = cv.createMergeDebevec()
+# hdr_debevec = merge_debevec.process(img_list, times=exposure_times.copy())
+# merge_robertson = cv.createMergeRobertson()
+# hdr_robertson = merge_robertson.process(img_list, times=exposure_times.copy())
+#
+# tonemap1 = cv.createTonemap(gamma=2.2)
+# res_debevec = tonemap1.process(hdr_debevec.copy())
+#
+# merge_mertens = cv.createMergeMertens()
+# res_mertens = merge_mertens.process(img_list)
+#
+# res_debevec_8bit = np.clip(res_debevec * 255, 0, 255).astype('uint8')
+# hdr_robertson_8bit = np.clip(hdr_robertson * 255, 0, 255).astype('uint8')
+# res_mertens_8bit = np.clip(res_mertens * 255, 0, 255).astype('uint8')
+# cv.imwrite("ldr_debevec.jpg", res_debevec_8bit)
+# cv.imwrite("ldr_robertson.jpg", hdr_robertson_8bit)
+# cv.imwrite("fusion_mertens.jpg", res_mertens_8bit)
+#
+# cal_debevec = cv.createCalibrateDebevec()
+# crf_debevec = cal_debevec.process(img_list, times=exposure_times)
+# hdr_debevec = merge_debevec.process(img_list, times=exposure_times.copy(), response=crf_debevec.copy())
+#
+# cal_robertson = cv.createCalibrateRobertson()
+# crf_robertson = cal_robertson.process(img_list, times=exposure_times)
+# hdr_robertson = merge_robertson.process(img_list, times=exposure_times.copy(), response=crf_robertson.copy())
+
+
+# from __future__ import print_function
+# import cv2 as cv
+# import argparse
+#
+#
+# def detectAndDisplay(frame):
+#     frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+#     frame_gray = cv.equalizeHist(frame_gray)
+#     faces = face_cascade.detectMultiScale(frame_gray)
+#     for (x, y, w, h) in faces:
+#         center = (x + w // 2, y + h / 2)
+#         frame = cv.ellipse(frame, center, (w // 2, h // 2), 0, 0, 360, (255, 0, 255), 4)
+#         faceROI = frame_gray[y:y + h, x:x + w]
+#
+#         eyes = eyes_cascade.detectMultiScale(faceROI)
+#         for (x2, y2, w2, h2) in eyes:
+#             eye_center = (x + x2 + w2 // 2, y + y2 + h2 // 2)
+#             radius = int(round((w2 + h2) * 0.25))
+#             frame = cv.circle(frame, eye_center, radius, (255, 0, 0), 4)
+#     cv.imshow('Capture - Face detection', frame)
+#
+#
+# parser = argparse.ArgumentParser(description='Code for Cascade Classifier tutorial.')
+# parser.add_argument('--face_cascade', help='Path to face cascade.',
+#                     default='data/haarcascades/haarcascade_frontalface_alt.xml')
+# parser.add_argument('--eyes_cascade', help='Path to eyes cascade.',
+#                     default='data/haarcascades/haarcascade_eye_tree_eyeglasses.xml')
+# parser.add_argument('--camera', help='Camera divide number.', type=int, default=0)
+# args = =parser.parse_args()
+#
+# face_cascade_name = args.face_cascade
+# eyes_cascade_name = args.eyes_cascade
+# face_cascade = cv.CascadeClassifier()
+# eyes_cascade = cv.CascadeClassifier()
+#
+# if not face_cascade.load(cv.samples.findFile(eyes_cascade_name)):
+#     print('--(!)Error loading face cascade')
+#     exit(0)
+# if not eyes_cascade.load(cv.samples.findFile(eyes_cascade_name)):
+#     print('--(!)Error loading eyes cascade')
+#     exit(0)
+# camera_device = args.camera
+#
+# cap = cv.VideoCapture(camera_device)
+# if not cap.isOpened:
+#     print('--(!)Error opening video capture')
+#     exit(0)
+# while True:
+#     ret, frame = cap.read()
+#     if frame is None:
+#         print('--(!) No captured frame -- Break!')
+#         break
+#     detectAndDisplay(frame)
+#     if cv.waitKey(10) == 27:
+#         break
+
 
